@@ -31,26 +31,6 @@ public class MainActivity extends AppCompatActivity {
     ObjectOutputStream oos;
     ObjectInputStream ois;
 
-    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
-            = new BottomNavigationView.OnNavigationItemSelectedListener() {
-
-        @Override
-        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            switch (item.getItemId()) {
-                case R.id.navigation_home:
-                    mTextMessage.setText(R.string.title_home);
-                    return true;
-                case R.id.navigation_dashboard:
-                    mTextMessage.setText(R.string.title_dashboard);
-                    return true;
-                case R.id.navigation_notifications:
-                    mTextMessage.setText(R.string.title_notifications);
-                    return true;
-            }
-            return false;
-        }
-    };
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,14 +38,27 @@ public class MainActivity extends AppCompatActivity {
 
         serverMessage = (TextView) findViewById(R.id.textView1);
         clientMessage = (EditText) findViewById(R.id.editText1);
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+
+        try {
+            StartTh1();
+        }catch(IOException ex) {
+            // Hello
+        }
+
+        Server2 client = new Server2();
+
+
+        /*try {
+            client.main();
+        }catch(IOException ex) {
+            // Hello
+        }*/
     }
 
 
-    public void Start(View view) throws IOException{
+    public void StartTh1() throws IOException{
         final String Text;
-        String send = " ";
+        String send = "  ";
         Text = clientMessage.getText().toString();
         m_objThreadClient = new Thread( new Runnable(){
             public void run()

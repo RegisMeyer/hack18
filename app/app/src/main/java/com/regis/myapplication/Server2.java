@@ -1,3 +1,7 @@
+package com.regis.myapplication;
+
+import android.app.Activity;
+
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -13,7 +17,7 @@ import java.util.Hashtable;
 public class Server2 {
 
     @SuppressWarnings("resource")
-    public static void main (String[] args) throws IOException {
+    public static void main () throws IOException {
 
         ServerSocket server = null;
         try {
