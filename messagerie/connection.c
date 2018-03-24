@@ -63,36 +63,36 @@ int client(int port, char addr[]) {
 	  int addrlen;
 	  int status;
 	  strcpy(buf,"Hello world\n");
-	  
-	  /* Create a UDP socket */
+	  printf("%s\n", buf);
+	  // Create a UDP socket
 	  sockd = socket(AF_INET, SOCK_DGRAM, 0);
 	  if (sockd == -1) {
 	    perror("Socket creation error");
 	    exit(1);
 	  }
 	 
-	  /* Configure client address */
+	  // Configure client address
 	  my_addr.sin_family = AF_INET;
 	  my_addr.sin_addr.s_addr = INADDR_ANY;
 	  my_addr.sin_port = 0;
 	 
 	  bind(sockd, (struct sockaddr*)&my_addr, sizeof(my_addr));
-		 if (status < 0){
-				perror("Erreur bind client\n");
-				exit(0);
-			}
-	  memset(buf, 0, MAX_BUF);
-	  /* Set server address */
+	 if (status < 0){
+			perror("Erreur bind client\n");
+			exit(0);
+		}
+
+	  // Set server address 
 	  srv_addr.sin_family = AF_INET;
 	  inet_aton(addr, &srv_addr.sin_addr);
 	  srv_addr.sin_port = htons(port);
 	 
 	  while(1) {  		
-	      status = sendto(sockd, buf, MAX_BUF, 0, (struct sockaddr*)&srv_addr, sizeof(srv_addr));
-	      if (status < 0){
+			status = sendto(sockd, buf, MAX_BUF, 0, (struct sockaddr*)&srv_addr, sizeof(srv_addr));
+			if (status < 0){
 			perror("Erreur sendto client\n");
 			exit(0);
-		}
+			}
 	  		status = recvfrom(sockd, buf, MAX_BUF, 0, (struct sockaddr*) &srv_addr, &addrlen);
 	  		if (status < 0){
 			perror("Erreur recvfrom client\n");
