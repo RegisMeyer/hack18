@@ -32,14 +32,24 @@ int server(int port) {
 	my_name.sin_port = htons(port);
 
 	status = bind(sockd, (struct sockaddr*) &my_name, sizeof(my_name));
+	if (status < 0){
+		perror("Erreur bind\n");
+		exit(0);
+	}
 
 	addrlen = sizeof(cli_addr);
 	
 	while (1) {
 		status = recvfrom(sockd, buf, MAX_BUF, 0, (struct sockaddr*) &cli_addr, &addrlen);
-				
+		if (status < 0){
+			perror("Erreur recvfrom\n");
+			exit(0);
+		}	
 		sendto(sockd, buf, MAX_BUF, 0, (struct sockaddr*)&cli_addr, sizeof(cli_addr));
-		
+		if (status < 0){
+			perror("Erreur sendto\n");
+			exit(0);
+		}
 		printf("server : %s\n", buf);
 	}
 	close(sockd);
@@ -51,7 +61,7 @@ int client(int port, char addr[]) {
 	  char buf[MAX_BUF];
 	  //int count;
 	  int addrlen;
-	  //int status;
+	  int status;
 	  strcpy(buf,"Hello world\n");
 	  
 	  /* Create a UDP socket */
@@ -67,7 +77,10 @@ int client(int port, char addr[]) {
 	  my_addr.sin_port = 0;
 	 
 	  bind(sockd, (struct sockaddr*)&my_addr, sizeof(my_addr));
-	 
+		 if (status < 0){
+				perror("Erreur bind client\n");
+				exit(0);
+			}
 	  memset(buf, 0, MAX_BUF);
 	  /* Set server address */
 	  srv_addr.sin_family = AF_INET;
@@ -75,10 +88,16 @@ int client(int port, char addr[]) {
 	  srv_addr.sin_port = htons(port);
 	 
 	  while(1) {  		
-	      sendto(sockd, buf, MAX_BUF, 0, (struct sockaddr*)&srv_addr, sizeof(srv_addr));
-	      
+	      status = sendto(sockd, buf, MAX_BUF, 0, (struct sockaddr*)&srv_addr, sizeof(srv_addr));
+	      if (status < 0){
+			perror("Erreur sendto client\n");
+			exit(0);
+		}
 	  		status = recvfrom(sockd, buf, MAX_BUF, 0, (struct sockaddr*) &srv_addr, &addrlen);
-	  		
+	  		if (status < 0){
+			perror("Erreur recvfrom client\n");
+			exit(0);
+		}
 	  		printf("client : %s\n", buf);
 	  		
 

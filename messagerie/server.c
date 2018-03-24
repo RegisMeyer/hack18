@@ -68,7 +68,6 @@ int main (int argc, char *argv[])
 	bin_plein = sem_b1_plein;
 	bout_vide = sem_b2_vide;
 	bout_plein = sem_b2_plein;
-	
 	printf("Attribution des objets terminé\n");
 
 	char c;
