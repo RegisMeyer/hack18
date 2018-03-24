@@ -22,14 +22,16 @@ void* Lectureclavier(void* arguments){
 	clavierArgsThread* args = arguments;
 	int ret;
 	int status;
-	char buf[1];
+	char buf[MAX_BUF];
 	
 	while(1){
+		memset(buf,0,MAX_BUF);
+
 		// On lit stdin et on écrit ce qui a été lu dans args->c. Read est bloquant s'il n'y a rien à lire
-		ret = read(STDIN_FILENO,buf, 1);
+		ret = read(STDIN_FILENO,buf, MAX_BUF);
 		if (ret<0) { perror("read"); }
 
-		status = sendto(args->sockd, (void*)buf, 1, 0, (struct sockaddr*) &(args->sockAddr), sizeof(args->sockAddr));
+		status = sendto(args->sockd, (void*)buf, MAX_BUF, 0, (struct sockaddr*) &(args->sockAddr), sizeof(args->sockAddr));
 		printf("envoie = %d\n", buf[0]);
 		if (status < 0){
 			perror("Erreur sendto client\n");

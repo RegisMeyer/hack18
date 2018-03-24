@@ -107,12 +107,12 @@ int client(int port, char addr[]) {
 
 
 	while(1) {  		
-		status = recvfrom(sockd, buf, MAX_BUF, 0, (struct sockaddr*) &srv_addr, &addrlen);
+		/*status = recvfrom(sockd, buf, MAX_BUF, 0, (struct sockaddr*) &srv_addr, &addrlen);
 		if (status < 0){
 			perror("Erreur recvfrom client\n");
 			exit(0);
 			printf("client : %s\n", buf);
-		}
+		}*/
 	}
 	
 	  	
