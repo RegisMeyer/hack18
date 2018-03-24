@@ -8,10 +8,6 @@
 #include <unistd.h>
 #include <time.h>
 
-#include "point.h"
-#include "irc.h"
-#include "pwm.h"
- 
 #define MAX_BUF 32
 
 char buf[MAX_BUF];
