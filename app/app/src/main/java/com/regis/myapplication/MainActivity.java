@@ -7,9 +7,29 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
+
+import android.os.Bundle;
+import android.app.Activity;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.TextView;
+
+
+
+
 public class MainActivity extends AppCompatActivity {
 
-    private TextView mTextMessage;
+    Thread m_objThreadClient;
+    Socket clientSocket;
+    TextView serverMessage;
+    EditText clientMessage;
+    String sIn, sOut;
+    ObjectOutputStream oos;
+    ObjectInputStream ois;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -36,9 +56,37 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mTextMessage = (TextView) findViewById(R.id.message);
+        serverMessage = (TextView) findViewById(R.id.textView1);
+        clientMessage = (EditText) findViewById(R.id.editText1);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
     }
 
+
+    public void Start(View view) throws IOException{
+        final String Text;
+        String send = " ";
+        Text = clientMessage.getText().toString();
+        m_objThreadClient = new Thread( new Runnable(){
+            public void run()
+            {
+                try {
+                    clientSocket = new Socket("10.0.2.2", 4000);
+                    oos = new ObjectOutputStream (clientSocket.getOutputStream());
+                    oos.writeObject(Text);
+                    oos.flush();
+
+                } catch (IOException e) {
+                    serverMessage.setText(e.getMessage());
+                }
+
+            }
+        });
+        serverMessage.setText(send);
+
+        m_objThreadClient.start();
+
+    }
+
 }
+
