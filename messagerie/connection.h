@@ -12,5 +12,5 @@
 
 char buf[MAX_BUF];
 
-int receiver(int port);
-int sender(int port, char addr[]);
+int server(int port);
+int client(int port, char addr[]);
