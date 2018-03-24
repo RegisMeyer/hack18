@@ -1,14 +1,23 @@
 #include "connection.h"
 
-int client(int port) {
+int main(int argc, char* argv[]){
+	char c = getchar();
+	if(c == "s"){
+		server(atoi(argv[1]));
+	}
+	else if(c == "c"){
+		client(atoi(argv[1]), argv[2]);
+	}
+	return 1;
+
+}
+
+int server(int port) {
 	printf ("port=%d\n");
 	int sockd;
 	struct sockaddr_in my_name, cli_name;
-	//char buf[MAX_BUF];
 	int status;
 	int addrlen;
-
-	printf("port = %d\n", port);
 	
 	/* Create a UDP socket */
 	sockd = socket(AF_INET, SOCK_DGRAM, 0);
@@ -28,16 +37,23 @@ int client(int port) {
 	
 	while (1) {
 		status = recvfrom(sockd, buf, MAX_BUF, 0, (struct sockaddr*) &cli_name, &addrlen);
+				
+		sendto(sockd, buf, MAX_BUF, 0, (struct sockaddr*)&cli_name, sizeof(cli_addr));
+		
+		printf("server : %s\n", buf);
 	}
 	close(sockd);
 }
 
-int server(int port, char addr[]) {	 
+int client(int port, char addr[]) {	 
 	  int sockd;
 	  struct sockaddr_in my_addr, srv_addr;
 	  char buf[MAX_BUF];
 	  int count;
 	  int addrlen;
+	  int status;
+	  	
+	char buf[] = "Hello world\n";
 	  
 	  /* Create a UDP socket */
 	  sockd = socket(AF_INET, SOCK_DGRAM, 0);
@@ -59,8 +75,14 @@ int server(int port, char addr[]) {
 	  inet_aton(addr, &srv_addr.sin_addr);
 	  srv_addr.sin_port = htons(port);
 	 
-	  while(1) {
+	  while(1) {  		
 	      sendto(sockd, buf, MAX_BUF, 0, (struct sockaddr*)&srv_addr, sizeof(srv_addr));
+	      
+	  		status = recvfrom(sockd, buf, MAX_BUF, 0, (struct sockaddr*) &srv_name, &addrlen);
+	  		
+	  		printf("client : %s\n", buf);
+	  		
+
 	  }
 	  
 	  close(sockd);
