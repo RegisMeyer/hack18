@@ -1,25 +1,40 @@
 #include "lectureClavier.h"
+#include <sys/select.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/mman.h>
+#include <semaphore.h>
+#include <pthread.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
+#define MAX_BUF 32
 
 // Lectureclavier tourne dans un thread et permet de récupérer les caractères tapés au clavier
 // arguments : permet de passer des arguments au thread
 void* Lectureclavier(void* arguments){
 	clavierArgsThread* args = arguments;
 	int ret;
+	int status;
+	char buf[1];
 	
 	while(1){
 		// On lit stdin et on écrit ce qui a été lu dans args->c. Read est bloquant s'il n'y a rien à lire
-		ret = read(STDIN_FILENO,&args->c, 1);
+		ret = read(STDIN_FILENO,buf, 1);
 		if (ret<0) { perror("read"); }
-		
-		// On attend que bout soit vide
-		ret = sem_wait(args->bout_vide);
-		if (ret!=0) { perror("semwait"); }
 
-		// On écrit dans bout le contenu de args->c
-		*(args->bout) = args->c;
+		status = sendto(args->sockd, (void*)buf, 1, 0, (struct sockaddr*) &(args->sockAddr), sizeof(args->sockAddr));
+		printf("envoie = %d\n", buf[0]);
+		if (status < 0){
+			perror("Erreur sendto client\n");
+			exit(0);
+		}
 
-		// On libère le sémaphore bout_plein pour indiquer qu'on a remplit bout
-		ret = sem_post(args->bout_plein);
-		if (ret!=0) { perror("semwait"); }
 	}
 }

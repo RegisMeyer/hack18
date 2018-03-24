@@ -1,4 +1,6 @@
 #include "connection.h"
+#include "lectureClavier.h"
+#include <pthread.h>
 
 int main(int argc, char* argv[]){
 	char c = getchar();
@@ -56,52 +58,63 @@ int server(int port) {
 }
 
 int client(int port, char addr[]) {	 
-	  int sockd;
-	  struct sockaddr_in my_addr, srv_addr;
-	  char buf[MAX_BUF];
-	  //int count;
-	  int addrlen;
-	  int status;
-	  strcpy(buf,"Hello world\n");
-	  printf("%s\n", buf);
-	  // Create a UDP socket
-	  sockd = socket(AF_INET, SOCK_DGRAM, 0);
-	  if (sockd == -1) {
-	    perror("Socket creation error");
-	    exit(1);
-	  }
-	 
-	  // Configure client address
-	  my_addr.sin_family = AF_INET;
-	  my_addr.sin_addr.s_addr = INADDR_ANY;
-	  my_addr.sin_port = 0;
-	 
-	  bind(sockd, (struct sockaddr*)&my_addr, sizeof(my_addr));
-	 if (status < 0){
-			perror("Erreur bind client\n");
-			exit(0);
-		}
+	int sockd;
+	struct sockaddr_in my_addr, srv_addr;
+	char buf[MAX_BUF];
+	//int count;
+	int addrlen;
+	int status;
+	strcpy(buf,"Hello world\n");
 
-	  // Set server address 
-	  srv_addr.sin_family = AF_INET;
-	  inet_aton(addr, &srv_addr.sin_addr);
-	  srv_addr.sin_port = htons(port);
+	// Create a UDP socket
+	sockd = socket(AF_INET, SOCK_DGRAM, 0);
+	if (sockd == -1) {
+	perror("Socket creation error");
+	exit(1);
+	}
+
+	// Configure client address
+	my_addr.sin_family = AF_INET;
+	my_addr.sin_addr.s_addr = INADDR_ANY;
+	my_addr.sin_port = 0;
+
+	bind(sockd, (struct sockaddr*)&my_addr, sizeof(my_addr));
+	if (status < 0){
+		perror("Erreur bind client\n");
+		exit(0);
+	}
+
+	// Set server address 
+	srv_addr.sin_family = AF_INET;
+	inet_aton(addr, &srv_addr.sin_addr);
+	srv_addr.sin_port = htons(port);
 	 
-	  while(1) {  		
-			status = sendto(sockd, buf, MAX_BUF, 0, (struct sockaddr*)&srv_addr, sizeof(srv_addr));
-			if (status < 0){
-			perror("Erreur sendto client\n");
-			exit(0);
-			}
-	  		status = recvfrom(sockd, buf, MAX_BUF, 0, (struct sockaddr*) &srv_addr, &addrlen);
-	  		if (status < 0){
+
+
+
+	char c;
+	int ret;
+	clavierArgsThread args;
+
+	// Attribution des arguments du thread
+
+	args.sockd = sockd;
+	args.sockAddr = srv_addr;
+	// Création d'un thread pour la lecture du clavier
+	pthread_t threadID;
+	// On crée un thread dans lequel la fonction Lectureclavier sera exécutée. On passe également les arguments contenus dans args
+	ret = pthread_create(&threadID, NULL, (void*)Lectureclavier, (void*)&args);
+
+
+	while(1) {  		
+		status = recvfrom(sockd, buf, MAX_BUF, 0, (struct sockaddr*) &srv_addr, &addrlen);
+		if (status < 0){
 			perror("Erreur recvfrom client\n");
 			exit(0);
+			printf("client : %s\n", buf);
 		}
-	  		printf("client : %s\n", buf);
-	  		
-
-	  }
-	  
-	  close(sockd);
+	}
+	
+	  	
+	close(sockd);
 }

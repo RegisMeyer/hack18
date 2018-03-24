@@ -82,6 +82,8 @@ int main (int argc, char *argv[])
 	// Création d'un thread pour la lecture du clavier
 	pthread_t threadID;
 	// On crée un thread dans lequel la fonction Lectureclavier sera exécutée. On passe également les arguments contenus dans args
+	createThread();
+
 	ret = pthread_create(&threadID, NULL, (void*)Lectureclavier, (void*)&args);
 	// Vérifie s'il y a eu une erreur à la création du thread
 	if (ret!=0) { perror("pthread"); }
