@@ -14,12 +14,50 @@ int main(int argc, char* argv[]){
 
 }
 
+
+struct connected{
+	int nb;
+	struct sockaddr_in tab_sock[3]; 
+}; 
+
+
+int sockaddr_cmp(struct sockaddr_in x, struct sockaddr_in y)
+{
+	int rep = 0;
+	
+	if(x.sin_addr.s_addr == y.sin_addr.s_addr){
+		printf("ok\n");
+		rep = 1;
+	}
+	return rep;
+}
+
+int is_notin(struct connected myconnections, struct sockaddr_in sock){
+	int lim = myconnections.nb;
+	int rep = 1;
+	for(int i = 0; i < lim; i++){
+		if(sockaddr_cmp(myconnections.tab_sock[i], sock)){
+			rep = 0;
+		}
+	}
+	return rep;
+}
+
+
+
+
+
+
 int server(int port) {
 	printf ("port=%d\n", port);
 	int sockd;
 	struct sockaddr_in my_name, cli_addr;
 	int status;
 	int addrlen;
+	struct connected allConnections;
+	
+	/*Init tab connections*/
+	allConnections.nb = 0;
 	
 	/* Create a UDP socket */
 	sockd = socket(AF_INET, SOCK_DGRAM, 0);
@@ -46,8 +84,14 @@ int server(int port) {
 		if (status < 0){
 			perror("Erreur recvfrom\n");
 			exit(0);
-		}	
-		sendto(sockd, buf, MAX_BUF, 0, (struct sockaddr*)&cli_addr, sizeof(cli_addr));
+		}
+		if (is_notin(allConnections, cli_addr)){
+			allConnections.nb += 1;
+			allConnections.tab_sock[allConnections.nb] = cli_addr;
+		}
+		for(int i = 0; i < allConnections.nb; i++){
+			sendto(sockd, buf, MAX_BUF, 0, (struct sockaddr*)&(allConnections.tab_sock[i]), sizeof(allConnections.tab_sock[i]));
+		}
 		if (status < 0){
 			perror("Erreur sendto\n");
 			exit(0);
