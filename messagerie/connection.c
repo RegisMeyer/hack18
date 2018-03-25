@@ -158,6 +158,7 @@ int client(int port, char addr[]) {
 			exit(0);
 			printf("client : %s\n", buf);
 		}
+		printf("%s\n", buf);
 	}
 	
 	  	
