@@ -149,9 +149,10 @@ int client(int port, char addr[]) {
 	// On crée un thread dans lequel la fonction Lectureclavier sera exécutée. On passe également les arguments contenus dans args
 	ret = pthread_create(&threadID, NULL, (void*)Lectureclavier, (void*)&args);
 
-
+	addrlen = sizeof(srv_addr);
+	
 	while(1) {  		
-		status = recvfrom(sockd, buf, MAX_BUF, 0, (struct sockaddr*) &srv_addr, sizeof(srv_addr));//&addrlen);
+		status = recvfrom(sockd, buf, MAX_BUF, 0, (struct sockaddr*) &srv_addr, &addrlen);//&addrlen);
 		if (status < 0){
 			perror("Erreur recvfrom client\n");
 			exit(0);
