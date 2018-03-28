@@ -32,7 +32,6 @@ void* Lectureclavier(void* arguments){
 		if (ret<0) { perror("read"); }
 
 		status = sendto(args->sockd, (void*)buf, MAX_BUF, 0, (struct sockaddr*) &(args->sockAddr), sizeof(args->sockAddr));
-		printf("envoie = %d\n", buf[0]);
 		if (status < 0){
 			perror("Erreur sendto client\n");
 			exit(0);

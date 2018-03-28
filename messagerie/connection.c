@@ -86,16 +86,17 @@ int server(int port) {
 			exit(0);
 		}
 		if (is_notin(allConnections, cli_addr)){
-			allConnections.nb += 1;
 			allConnections.tab_sock[allConnections.nb] = cli_addr;
+			allConnections.nb += 1;
 		}
 		for(int i = 0; i < allConnections.nb; i++){
-			sendto(sockd, buf, MAX_BUF, 0, (struct sockaddr*)&(allConnections.tab_sock[i]), sizeof(allConnections.tab_sock[i]));
+			status = sendto(sockd, buf, MAX_BUF, 0, (struct sockaddr*)&(allConnections.tab_sock[i]), sizeof(allConnections.tab_sock[i]));
+			if (status < 0){
+				perror("Erreur sendto\n");
+				exit(0);
+			}
 		}
-		if (status < 0){
-			perror("Erreur sendto\n");
-			exit(0);
-		}
+		
 		printf("server : %s\n", buf);
 	}
 	close(sockd);
@@ -113,8 +114,8 @@ int client(int port, char addr[]) {
 	// Create a UDP socket
 	sockd = socket(AF_INET, SOCK_DGRAM, 0);
 	if (sockd == -1) {
-	perror("Socket creation error");
-	exit(1);
+		perror("Socket creation error");
+		exit(1);
 	}
 
 	// Configure client address
@@ -122,7 +123,7 @@ int client(int port, char addr[]) {
 	my_addr.sin_addr.s_addr = INADDR_ANY;
 	my_addr.sin_port = 0;
 
-	bind(sockd, (struct sockaddr*)&my_addr, sizeof(my_addr));
+	status = bind(sockd, (struct sockaddr*)&my_addr, sizeof(my_addr));
 	if (status < 0){
 		perror("Erreur bind client\n");
 		exit(0);
@@ -141,7 +142,6 @@ int client(int port, char addr[]) {
 	clavierArgsThread args;
 
 	// Attribution des arguments du thread
-
 	args.sockd = sockd;
 	args.sockAddr = srv_addr;
 	// Création d'un thread pour la lecture du clavier
@@ -152,13 +152,12 @@ int client(int port, char addr[]) {
 	addrlen = sizeof(srv_addr);
 	
 	while(1) {  		
-		status = recvfrom(sockd, buf, MAX_BUF, 0, (struct sockaddr*) &srv_addr, &addrlen);//&addrlen);
+		status = recvfrom(sockd, buf, MAX_BUF, 0, (struct sockaddr*) &srv_addr, &addrlen);
 		if (status < 0){
 			perror("Erreur recvfrom client\n");
 			exit(0);
-			printf("client : %s\n", buf);
 		}
-		printf("%s\n", buf);
+		printf("client %s\n", buf);
 	}
 	
 	  	
